@@ -1,0 +1,17 @@
+# Stages 1-4 (data, features, baseline, CNN). Extended in later stages
+# (Stage 6-7 add fastapi, uvicorn, sqlalchemy, psycopg2-binary for
+# serving + Postgres).
+
+numpy
+pandas
+librosa
+soundfile
+scikit-learn
+matplotlib
+mlflow
+
+# Stage 4 — CNN. Use tensorflow-cpu unless you have a configured GPU.
+tensorflow-cpu
+
+# dev / test
+pytest

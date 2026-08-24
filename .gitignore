@@ -1,0 +1,32 @@
+# --- dataset -------------------------------------------------------------
+# Raw recordings are real voices (privacy) and large (size). Do NOT commit
+# them. The repo ships a couple of clips in data/sample/ so it runs, plus the
+# collection script to regenerate. The generated manifest is derived, not source.
+data/positive/
+data/negative/
+data/cold_stream/
+data/manifest.csv
+
+# --- models & experiment tracking/ regenrable artifacts ---------------------------------------
+*.keras
+*.h5
+*.joblib
+*.pkl
+*.onnx
+mlruns/
+models/
+mlflow.db
+
+
+# --- python environments and cache--------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+.avenv/
+.venv/
+venv/
+
+# --- os / editor ---------------------------------------------------------
+.DS_Store
+Thumbs.db
