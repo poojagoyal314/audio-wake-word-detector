@@ -98,6 +98,38 @@ def wav_to_logmel(path: str) -> np.ndarray:
     return signal_to_logmel(load_audio(path))
 
 
+# ---------------------------------------------------------------------------
+# MFCC features — the representation the SHIPPED model (logreg) uses.
+#
+# This is the single source of truth for MFCC extraction. Training, hard-negative
+# mining, and the serving container all import mfcc_features / mfcc_features_from_file
+# from here, so the production model can never be fed features computed a different
+# way than it was trained on (the train/serve-skew guarantee). Keeping it in
+# features.py — which only needs numpy + librosa — also means the serving container
+# does not have to pull in matplotlib/mlflow just to featurize a clip.
+# ---------------------------------------------------------------------------
+N_MFCC = 40           # number of MFCC coefficients
+POOLING = "mean+std"  # temporal pooling -> one fixed-length vector per clip
+MFCC_FEATURE_LEN = 2 * N_MFCC  # 80: mean and std of each coefficient
+
+
+def mfcc_features(y: np.ndarray) -> np.ndarray:
+    """Fixed-length MFCC feature vector (length MFCC_FEATURE_LEN) from a waveform.
+
+    MFCCs give an (N_MFCC, n_frames) matrix — still time-varying. A classical
+    model needs a fixed-length vector, so we pool over time with mean and std of
+    each coefficient. Mean = average spectral shape; std = how much it moves.
+    """
+    y = fix_length(np.asarray(y, dtype=np.float32))
+    mfcc = librosa.feature.mfcc(y=y, sr=TARGET_SR, n_mfcc=N_MFCC)
+    return np.concatenate([mfcc.mean(axis=1), mfcc.std(axis=1)]).astype(np.float32)
+
+
+def mfcc_features_from_file(path: str) -> np.ndarray:
+    """File path -> MFCC feature vector (loads + fixes length via load_audio)."""
+    return mfcc_features(load_audio(path))
+
+
 if __name__ == "__main__":
     # Tiny self-check you can run by hand: python src/features.py <some.wav>
     import sys

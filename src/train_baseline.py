@@ -62,26 +62,16 @@ from sklearn.metrics import (
 
 # make src/ importable whether run from repo root or elsewhere
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from features import load_audio, TARGET_SR, CLIP_SECONDS  # noqa: E402
+from features import (  # noqa: E402
+    load_audio, TARGET_SR, CLIP_SECONDS,
+    N_MFCC, POOLING, mfcc_features_from_file,
+)
 from data import load_manifest, make_splits  # noqa: E402
 from tracking import setup_mlflow, EXPERIMENT_NAME  # noqa: E402
 
-# --- baseline feature settings (logged to MLflow so runs are comparable) ----
-N_MFCC = 40          # number of MFCC coefficients
-POOLING = "mean+std"  # temporal pooling: one vector per clip regardless of length
-
-
-def extract_mfcc_features(path: str) -> np.ndarray:
-    """One clip -> fixed-length MFCC feature vector (length 2 * N_MFCC).
-
-    MFCCs give an (N_MFCC, n_frames) matrix — still time-varying. A classical
-    model needs a fixed-length vector, so we pool across time by taking the mean
-    and standard deviation of each coefficient. Mean captures the average
-    spectral shape; std captures how much it moves over the clip.
-    """
-    y = load_audio(path)  # 16 kHz, mono, fixed to CLIP_SAMPLES — same as the CNN
-    mfcc = librosa.feature.mfcc(y=y, sr=TARGET_SR, n_mfcc=N_MFCC)
-    return np.concatenate([mfcc.mean(axis=1), mfcc.std(axis=1)]).astype(np.float32)
+# MFCC extraction now lives in features.py (single source of truth). This alias
+# keeps the familiar name for callers that import extract_mfcc_features from here.
+extract_mfcc_features = mfcc_features_from_file
 
 
 def build_matrix(df, data_root: Path):

@@ -44,19 +44,13 @@ from data import load_manifest, make_splits  # noqa: E402
 from train_baseline import build_matrix, make_model  # noqa: E402
 
 HOP_SECONDS = 0.5        # how far the window jumps each step
-DEBOUNCE_SECONDS = 3.0  # ignore new triggers for this long after one fires
+DEBOUNCE_SECONDS = 3.0   # ignore new triggers for this long after one fires
 HOP_SAMPLES = int(TARGET_SR * HOP_SECONDS)
 
-# For the classical model we score with the SAME MFCC features it was trained on.
-# We import that extractor, but it works on a file path — so for stream windows
-# we replicate its math on an in-memory array to avoid writing temp files.
-from train_baseline import N_MFCC  # noqa: E402
-
-
-def mfcc_vector_from_signal(y: np.ndarray) -> np.ndarray:
-    """MFCC mean+std vector from an in-memory window (mirrors train_baseline)."""
-    mfcc = librosa.feature.mfcc(y=y.astype(np.float32), sr=TARGET_SR, n_mfcc=N_MFCC)
-    return np.concatenate([mfcc.mean(axis=1), mfcc.std(axis=1)]).astype(np.float32)
+# Score stream windows with the SAME MFCC features the model was trained on —
+# the canonical extractor from features.py (single source of truth). This alias
+# keeps the in-memory name used elsewhere (e.g. hard_negative_mining).
+from features import mfcc_features as mfcc_vector_from_signal  # noqa: E402,F401
 
 
 def load_stream(path: Path) -> np.ndarray:

@@ -24,7 +24,7 @@ import numpy as np
 # make src/ importable when running `pytest` from the repo root
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-import src.features as F  # noqa: E402
+import features as F  # noqa: E402
 
 
 def _synth_tone(freq: float = 440.0, seconds: float = 3.0) -> np.ndarray:
@@ -50,6 +50,17 @@ def test_feature_contract_is_frozen():
     assert F.FMAX == 8000
     assert F.TOP_DB == 80.0
     assert F.FEATURE_SHAPE == (64, 301)
+    # MFCC contract (the shipped logreg's features) — lock it too.
+    assert F.N_MFCC == 40
+    assert F.POOLING == "mean+std"
+    assert F.MFCC_FEATURE_LEN == 80
+
+
+def test_mfcc_feature_vector_shape():
+    sig = _synth_tone()
+    v = F.mfcc_features(sig)
+    assert v.shape == (F.MFCC_FEATURE_LEN,)
+    assert v.dtype == np.float32
 
 
 # --- 2. transform behaviour ------------------------------------------------
