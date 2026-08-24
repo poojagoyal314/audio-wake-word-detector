@@ -1,0 +1,15 @@
+# Serving-only dependencies — what the inference container actually needs.
+# Deliberately EXCLUDES tensorflow, mlflow, matplotlib, pandas, pytest: those are
+# for training/evaluation/experimentation and would bloat the serving image
+# (tensorflow alone is hundreds of MB) for no runtime benefit. Same principle as
+# serve.py importing only features.py: the serving artifact carries only what it
+# needs to answer a request.
+
+numpy
+scikit-learn
+librosa
+soundfile
+joblib
+fastapi
+uvicorn
+python-multipart
