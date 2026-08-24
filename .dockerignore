@@ -1,0 +1,34 @@
+# Keep the build context small and the image clean. Same idea as .gitignore, but
+# it controls what gets sent into the Docker BUILD, not what gets committed.
+
+# --- raw audio: privacy + size, never needed in a serving image ------------
+data/positive/
+data/negative/
+data/cold_stream/
+data/sample/
+data/manifest.csv
+
+# --- experiment + training artifacts: the container serves, it doesn't train
+mlruns/
+mlartifacts/
+mlflow.db
+
+# --- environments & caches --------------------------------------------------
+.avenv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+
+# --- git + docs + local-only files -----------------------------------------
+.git/
+.gitignore
+*.md
+plan.docx
+tests/
+
+# --- IMPORTANT: do NOT ignore models/ --------------------------------------
+# The Dockerfile COPYs models/model.joblib into the image. If a broad rule like
+# *.joblib excluded it, the COPY would fail. We keep models/ in the build
+# context on purpose. (Nothing above matches it — this note is the reminder.)
