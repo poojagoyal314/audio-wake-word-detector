@@ -13,5 +13,16 @@ mlflow
 # Stage 4 — CNN. Use tensorflow-cpu unless you have a configured GPU.
 tensorflow-cpu
 
+# Stage 6 — serving. joblib saves/loads the model; fastapi+uvicorn serve it;
+# python-multipart is required by FastAPI for file uploads.
+joblib
+fastapi
+uvicorn
+python-multipart
+
+# Host-side m4a decoding for the cold-stream scripts (the container uses system
+# ffmpeg instead). Harmless to have installed either way.
+imageio-ffmpeg
+
 # dev / test
 pytest
