@@ -77,7 +77,7 @@ Full reasoning — every decision, result, and stumble — is in [`Audio_Classif
 |---|---|
 | Accuracy | 0.906 |
 | AUC | 0.969 |
-| Equal Error Rate | 0.104 |
+| Equal Error Rate | 0.104 (at threshold 0.639) |
 
 **False accepts per hour** on real keyword-free audio, before vs. after hard negative mining (held-out recording):
 
