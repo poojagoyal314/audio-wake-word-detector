@@ -1,8 +1,8 @@
-# Like a Bosch — a wake-word detector, built honestly
+# Like a Bosch — a wake-word detector
 
-A spoken-phrase detector that listens for **"like a Bosch"** and ignores everything else. The model is deliberately modest; the point of the project is doing the *whole* thing properly — honest evaluation, a defensible model choice, and a containerized, database-backed service you can actually run.
+A spoken-phrase detector that listens for "like a Bosch" and ignores everything else. The model is deliberately modest; the point of the project is doing the thing properly — honest evaluation, a defensible model choice, and a containerized, database-backed service you can actually run.
 
-> **The headline finding:** the model scored **0.91 accuracy / 0.97 AUC** on a held-out test set — but when evaluated on a real hour of keyword-free audio, it false-triggered **~300 times per hour**, which is unusable. Diagnosing *why* (the base-rate problem) and fixing it with **hard negative mining** (cutting false accepts **~96%** with no loss of recall) is the core of the project. Clean offline metrics can hide a model that fails in deployment; this project measures the gap instead of assuming it away.
+> The headline finding: the model scored **0.91 accuracy / 0.97 AUC** on a held-out test set — but when evaluated on a real hour of keyword-free audio, it false-triggered **~300 times per hour**, which is unusable. Diagnosing why (the base-rate problem) and fixing it with **hard negative mining** (cutting false accepts **~96%** with no loss of recall) is the core of the project. Clean offline metrics can hide a model that fails in deployment; this project measures the gap instead of assuming it away.
 
 ---
 
@@ -64,7 +64,7 @@ The project was built in stages, each on its own feature branch:
 | 1–2 | Data manifest, stratified split, shared feature extraction (log-Mel / MFCC) with a skew-guard test |
 | 3 | MFCC classical baseline (logreg / random forest) with MLflow tracking |
 | 4 | Small log-Mel CNN — the measured baseline-vs-deep-learning comparison |
-| 5 | Honest evaluation: test-set metrics, threshold sweep + EER, false-accepts-per-hour, hard negative mining |
+| 5 | Evaluation: test-set metrics, threshold sweep + EER, false-accepts-per-hour, hard negative mining |
 | 6 | Containerized inference service (FastAPI, model baked in) |
 | 7 | Multi-container app: Postgres prediction logging via Docker Compose |
 | 8 | Live microphone client |
@@ -77,7 +77,7 @@ Full reasoning — every decision, result, and stumble — is in [`Audio_Classif
 |---|---|
 | Accuracy | 0.906 |
 | AUC | 0.969 |
-| Equal Error Rate | 0.104 |
+| Equal Error Rate | 0.104 (at threshold 0.639) |
 
 **False accepts per hour** on real keyword-free audio, before vs. after hard negative mining (held-out recording):
 
