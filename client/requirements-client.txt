@@ -1,0 +1,8 @@
+# Host-side dependencies for the live microphone client (client/mic_client.py).
+# Runs on your machine, not in the container — it holds the mic and POSTs windows
+# to the /predict service.
+
+sounddevice     # live microphone capture (uses PortAudio, bundled on Windows)
+numpy           # audio buffer handling
+soundfile       # package a window as an in-memory WAV
+requests        # POST windows to /predict
