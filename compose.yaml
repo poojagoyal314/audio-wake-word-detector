@@ -1,0 +1,42 @@
+# Stage 7 — multi-container app: the detector API + a Postgres database.
+# Start it all with:  docker compose up --build
+#
+# Two services, two images, ONE Dockerfile:
+#   api -> built from THIS project's Dockerfile (our custom code)
+#   db  -> pulled off-the-shelf (postgres:16), needs no Dockerfile from us
+
+services:
+  api:
+    build: .                         # build from the Dockerfile in this directory
+    ports:
+      - "8000:8000"                  # publish container:8000 to host:8000 (= -p)
+    environment:
+      # 'db' here is the SERVICE NAME below — Compose resolves it to the Postgres
+      # container's current IP on the shared private network. We never touch IPs.
+      # The URL's two jobs: db:5432 = WHERE (networking); iris:irispass/predictions
+      # = WHO/WHAT (credentials + which database).
+      - DATABASE_URL=postgresql://iris:irispass@db:5432/predictions
+    depends_on:
+      - db                           # start db before api (see caveat below)
+
+  db:
+    image: postgres:16               # off-the-shelf: pulled, not built
+    environment:
+      # Postgres reads these on FIRST boot and creates this user + database.
+      - POSTGRES_USER=iris
+      - POSTGRES_PASSWORD=irispass
+      - POSTGRES_DB=predictions
+    volumes:
+      # Named volume (bare name, Docker-managed) so the DB survives down/up.
+      # Named, not a bind mount: it's internal binary state we never hand-edit,
+      # and bind-mounting a Windows folder into Postgres causes permission issues.
+      - pgdata:/var/lib/postgresql/data
+
+# Declare the named volume so Compose manages it.
+volumes:
+  pgdata:
+
+# CAVEAT (known, handled in code): depends_on waits for the db CONTAINER to
+# start, not for Postgres inside it to be READY for connections. serve.py's
+# db.init_db() retries the first connection to bridge that gap. The "proper"
+# fix is a healthcheck — deferred, noted as future work.

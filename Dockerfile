@@ -7,6 +7,12 @@
 # — slow, fragile, and ultimately larger. slim is the sane default for ML.
 FROM python:3.12-slim
 
+
+# Flush Python stdout/stderr immediately so print() shows up in `docker compose
+# logs` in real time (default buffering can hide startup messages entirely).
+ENV PYTHONUNBUFFERED=1
+
+
 # --- System (OS-level) dependencies ----------------------------------------
 # libsndfile1 and ffmpeg are NOT Python packages, so pip cannot install them.
 # They are OS-level libraries that librosa/soundfile need to read audio:
@@ -56,3 +62,5 @@ EXPOSE 8000
 # --app-dir src makes 'serve:app' importable; --host 0.0.0.0 is the binding that
 # makes the container reachable from the host.
 CMD ["uvicorn", "--app-dir", "src", "serve:app", "--host", "0.0.0.0", "--port", "8000"]
+
+

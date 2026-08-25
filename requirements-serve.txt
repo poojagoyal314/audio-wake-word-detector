@@ -13,3 +13,8 @@ joblib
 fastapi
 uvicorn
 python-multipart
+
+# Stage 7 — Postgres prediction logging. psycopg2-binary is the driver;
+# sqlalchemy is the higher-level layer so we don't hand-write raw SQL strings.
+sqlalchemy
+psycopg2-binary
